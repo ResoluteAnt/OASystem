@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gec.dao.DeptMapper">
+
+    <!-- {A}功能: 获取部门领导ID
+         String findDeptLeaderId(
+            @Param("deptId") String deptId); -->
+    <select id="findDeptLeaderId" resultType="string">
+		 select ur.user_id, ur.role_id,
+		 u.deptId, r.roleName from user_role ur
+		 left join user u on u.id = ur.user_id
+		 left join role r on r.id = ur.role_id
+		 where u.deptId=#{deptId}
+		 and r.roleName='leader'
+	</select>
+
+    <!-- {B}功能: 获取上级部门的 ID
+          String findHigherLevelDept(
+            @Param("deptId") String deptId);
+    -->
+    <select id="findHigherLevelDept"
+            resultType="string">
+		select d.parentId from dept d
+		where d.id=#{deptId}
+	</select>
+
+	<!--
+		  //{C}功能:根据前端传来的map进行数据搜索
+    	List<Dept> searchDept(
+         	   Map<String,String> map);
+	-->
+	<select id="searchDept"
+			resultType="com.gec.domain.Dept">
+		SELECT d.id,d.parentId,d.pids,d.deptName,d.deptDesc,
+		(SELECT dep.deptName FROM dept dep WHERE dep.id = d.parentId) AS supDeptName
+		FROM dept d
+		<where>
+			<if test="id!=null">
+				and d.id like "%"#{id}"%"
+			</if>
+			<if test="parentId!=null">
+				and d.parentId like "%"#{parentId}"%"
+			</if>
+			<if test="deptName!=null">
+				and d.deptName like "%"#{deptName}"%"
+			</if>
+			<if test="deptDesc!=null">
+				and d.deptDesc like "%"#{deptDesc}"%"
+			</if>
+			<if test="supDeptName!=null">
+				and supDeptName like "%"#{supDeptName}"%"
+			</if>
+		</where>
+	</select>
+	<!--
+		//{D}功能：查询所有部门
+    		List<Option> getAllDept();
+	-->
+	<select id="getAllDept" resultMap="optionsMap">
+		SELECT id,deptName FROM dept
+	</select>
+	<resultMap id="optionsMap" type="com.gec.domain.Option">
+		<result property="val" column="id"/>
+		<result property="text" column="deptName"/>
+	</resultMap>
+
+	<!--
+		//{E}功能：新增一个部门
+   		 void saveOneDept(
+            		Dept dept);
+	-->
+	<insert id="saveOneDept">
+		INSERT INTO dept(id,parentId,pids,deptName,deptDesc,hasSub,level)
+			VALUE(#{id},#{parentId},#{pids},#{deptName},#{deptDesc},#{hasSub},#{level})
+	</insert>
+
+	<!--
+		//{F}更新一个部门数据
+    	void updateOneDept(Dept dept);
+	-->
+	<update id="updateOneDept">
+		update dept
+		<set>
+			<if test="parentId!=null">
+				parentId = #{parentId},
+			</if>
+			<if test="pids!=null">
+				pids = #{pids},
+			</if>
+			<if test="deptDesc!=null">
+				deptDesc = #{deptDesc},
+			</if>
+			<if test="hasSub!=null">
+				hasSub = #{hasSub},
+			</if>
+			<if test="level!=null">
+				level = #{level},
+			</if>
+			<if test="deptName!=null">
+				deptName = #{deptName},
+			</if>
+
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--
+		 //{G}根据id搜索他下面是否还有部门 有就不允许删除
+			List<Dept> findChirdDeptById(String id);
+	-->
+	<select id="findChirdDeptById"
+			resultType="com.gec.domain.Dept">
+		SELECT * FROM dept WHERE parentId = #{id}
+	</select>
+
+	<!--
+		 //{H}根据部门id删除部门
+   		 //DELETE FROM dept WHERE id = 'd11'
+    		void delDeptById(String id);
+	-->
+	<delete id="delDeptById">
+		DELETE FROM dept WHERE id = #{id}
+	</delete>
+
+
+	<!--
+		//{F}根据id查询一个部门
+    		Dept getDeptById(
+            	@Param("id") String id );
+     -->
+	<select id="getDeptById"
+			resultType="com.gec.domain.Dept">
+		SELECT * FROM dept WHERE id = #{id}
+	</select>
+
+	<!--
+		//{H}获取部门的经理
+    	String findDeptManager(String deptId);
+	-->
+	<select id="findDeptManager" resultType="string">
+		 select ur.user_id, ur.role_id,
+		 u.deptId, r.roleName from user_role ur
+		 left join user u on u.id = ur.user_id
+		 left join role r on r.id = ur.role_id
+		 where u.deptId=#{deptId}
+		 and r.roleName='manager'
+	</select>
+
+
+</mapper>
+
+
+

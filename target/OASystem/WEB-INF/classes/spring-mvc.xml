@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- {1}设置包扫描路径 -->
+    <context:component-scan
+            base-package="com.gec.controller" />
+
+    <!-- {2}设置 MVC 注解驱动
+        如果, 在上包中扫描到有类标识有控制器或映射相关的注解项,
+        就会将其设置为一个控制器。
+     -->
+    <mvc:annotation-driven conversion-service="convertService"/>
+    <!--<mvc:resources mapping="/static/**"-->
+                   <!--location="/static/"/>-->
+    <bean id="convertService"
+          class="org.springframework.context.support.ConversionServiceFactoryBean">
+
+        <property name="converters">
+            <set>
+                <bean id="userConverter"
+                     class="com.gec.controller.UserConvertor"/>
+                <!--<bean id="deptConvertor"-->
+                    <!--class="com.gec.controller.DeptConvertor"/>-->
+            </set>
+        </property>
+    </bean>
+
+    <!-- {3}配置视图解析器
+            {内部资源视图解析器}
+         name: InternalResourceViewResolver
+     -->
+    <bean id="internalResourceViewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <!--{4}拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!-- 这个是要拦截的地址 -->
+            <mvc:mapping path="/Admin/*" />
+            <!-- 这个是要排除的地址 -->
+            <bean class="com.gec.intercepters.MyIntercepter" />
+        </mvc:interceptor>
+    </mvc:interceptors>
+    <!--
+        {5}文件上传解析器。
+        id=multipartResolver [固定名称]
+        这里要配置三个属性:
+        {a}DefaultEncoding 字符编码
+        {b}MaxUploadSize 最大上传大小
+        {c}UploadTempDir 临时目录
+     -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="DefaultEncoding" value="UTF-8" />
+        <property name="MaxUploadSize" value="62914560" />
+        <property name="UploadTempDir" value="/temp" />
+    </bean>
+</beans>
+
+

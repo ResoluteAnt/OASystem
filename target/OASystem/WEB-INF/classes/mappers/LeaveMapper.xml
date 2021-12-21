@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gec.dao.LeaveMapper">
+    <!--{a}功能：更新t_leave表中的办理人,
+                        更新任务ID
+     int updateAssigneeAndTask(
+          @Param("insId") String insId,
+          @Param("taskId") String taskId,
+          @Param("assignee") String assignee);
+   -->
+    <update id="updateAssigneeAndTask">
+        update t_leave SET
+          taskID = #{taskId},
+          assignee = #{assignee}
+        WHERE procInstId = #{insId};
+    </update>
+    <!--{2}新增请假记录-->
+    <insert id="addLeave">
+        INSERT INTO t_leave(
+          procInstId,procDefId,
+          taskId,startDate,
+          endDate,reason,
+		  days,leaveType,
+		  createTime,initiator,
+		  assignee,status)
+	    VALUES(#{procInstId},#{procDefId}, #{taskId}, #{startDate}, #{endDate},
+	      #{reason}, #{days}, #{leaveType}, #{createTime}, #{initiator},
+	      #{assignee}, #{status});
+    </insert>
+    <!--
+           //{2}查询我发起的任务..
+	        List<Leave> queryMyInitiate(
+            @Param("initiator") String initiator);
+    -->
+    <select id="queryMyInitiate" resultType="com.gec.domain.Leave">
+        SELECT lv.*,u.nickName assigneeName
+        FROM t_leave lv
+        left join user u on u.id=lv.assignee
+        WHERE lv.initiator = #{initiator}
+    </select>
+
+    <!--
+        //{4}查询我的待审批任务
+        List<Leave> queryWaitMyApprove(
+            @Param("assigneeId") String assigneeId);
+    -->
+    <select id="queryWaitMyApprove"
+            resultType="com.gec.domain.Leave">
+        SELECT lv.*,u.nickName initiatorName
+        FROM t_leave lv
+        left join user u on u.id=lv.initiator
+        WHERE lv.assignee = #{assigneeId}
+    </select>
+
+    <!--
+        //{5}查询待我审批的一个任务
+        Leave queryMyTaskByTaskId(
+            @Param("taskId") String taskId);
+    -->
+    <select id="queryMyTaskByTaskId" resultType="com.gec.domain.Leave">
+        SELECT lv.*,u.nickName initiatorName
+        FROM t_leave lv
+        left join user u on u.id=lv.initiator
+        WHERE lv.taskId = #{taskId}
+    </select>
+
+    <!--
+        int updateStatus(
+            @Param("insId") String insId,
+            @Param("status") String status);
+        {ps}一个实例只对应t_leave表一条记录
+        注意：只有唯一一条记录，一旦出现多条代码有问题
+    -->
+    <update id="updateStatus">
+        update t_leave lv
+        set lv.status=#{status}
+        where lv.procInstId=#{insId}
+    </update>
+    <!--
+        //更新状态根据任务ID
+        int updateStatusByTask(
+            @Param("taskId") String taskId,
+            @Param("status") String status);
+    -->
+    <update id="updateStatusByTask">
+        update t_leave lv
+        set lv.status=#{status}
+        where lv.taskId=#{taskId}
+    </update>
+    <!--
+        //更新办理人根据任务ID
+        int updateAssigneeByTask(
+            @Param("taskId") String taskId,
+            @Param("assignee") String assignee);
+    -->
+    <update id="updateAssigneeByTask">
+        update t_leave lv
+        set lv.assignee=#{assignee}
+        where lv.taskId=#{taskId}
+    </update>
+    <!--
+        List<String> findAllProcDefId(String procDefId);
+	    void delById(String i);
+    -->
+
+    <select id="findAllProcDefId" resultType="string">
+        SELECT procInstId FROM t_leave WHERE procDefId = #{procDefId}
+    </select>
+    <delete id="delById">
+        delete from t_leave where procInstId = #{id}
+    </delete>
+</mapper>
+
+
+

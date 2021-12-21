@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- {1} 配置 Spring 流程引擎配置器
+		(a) 数据源
+		(b) 事务管理器
+		(c) 数据库创表策略
+		(d) 归档策略
+		(e) 动态流程图字体
+		(f) 动态流程图字体
+		(g) 定时间器线程执行组件
+		类地址:
+			org.activiti.spring.SpringProcessEngineConfiguration
+		setDataSource(arg0);  
+		setTransactionManager(事务管理器);
+		setDatabaseSchemaUpdate( )
+		c.setJobExecutorActivate(jobExecutorActivate)
+		c.setHistory("");
+		c.setActivityFontName("宋体");
+		c.setLabelFontName("宋体");
+	  -->
+	<bean id="processEngineConfiguration"
+		  class="org.activiti.spring.SpringProcessEngineConfiguration">
+
+		<!-- {1} [引用 spring-mybatis.xml 中的数据源]  -->
+		<property name="dataSource" ref="BasicDataSource" />
+
+		<!-- {2} [引用 spring-mybatis.xml 中的事务管理器]  -->
+		<property name="transactionManager" ref="txManager" />
+
+		<!-- {3} 构建流程引擎时, 创表的设置  -->
+		<property name="databaseSchemaUpdate" value="true"/>
+
+		<!-- {4} 配置定时器线程组件   -->
+		<!-- <property name="jobExecutorActivate" value="true" /> -->
+
+		<!-- {5} 历史数据归档设置     -->
+		<property name="history" value="audit" />
+
+		<!-- {6} 动态流程图中显示的 activity 字体   -->
+		<property name="ActivityFontName" value="宋体" />
+		<!-- {7} 动态流程图中显示的 标签 字体   -->
+		<property name="LabelFontName" value="宋体" />
+
+	</bean>
+
+	<!-- {2} 配置 流程引擎 ProcessEngine
+		类地址:
+			org.activiti.spring.ProcessEngineFactoryBean
+		b.setApplicationContext(应用程序上下文);
+		b.setProcessEngineConfiguration(流程引擎配置器);
+	  -->
+	<bean id="ProcessEngineFactoryBean"
+		  class="org.activiti.spring.ProcessEngineFactoryBean">
+		<property name="ProcessEngineConfiguration"
+				  ref="processEngineConfiguration" />
+	</bean>
+
+	<!-- {3} 配置 RepositoryService 服务 -->
+	<bean id="RepositoryService"
+		  factory-bean="ProcessEngineFactoryBean"
+		  factory-method="getRepositoryService" />
+
+	<!-- {4} 配置 RuntimeService 服务 -->
+	<bean id="RuntimeService"
+		  factory-bean="ProcessEngineFactoryBean"
+		  factory-method="getRuntimeService" />
+
+	<!-- {5} 配置 TaskService 服务 -->
+	<bean id="TaskService"
+		  factory-bean="ProcessEngineFactoryBean"
+		  factory-method="getTaskService" />
+
+	<!-- {6} 配置 HistoryService 服务 -->
+	<bean id="HistoryService"
+		  factory-bean="ProcessEngineFactoryBean"
+		  factory-method="getHistoryService" />
+
+</beans>

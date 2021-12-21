@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gec.dao.RoleMapper">
+    <!--
+       {1}getRolePermission
+		        获取角色的权限数据。 (返回是一个 Set 集合)
+		Set<String> getRolePermission(
+		    @Param("roleId") String roleId );
+    -->
+    <select id="getRolePermission"
+         resultType="string">
+        select rp.permission from role_permission rp
+		where rp.role_id = #{roleId}
+    </select>
+
+    <!--
+       {2}查询所有角色
+          List<Role> getAllRole();
+    -->
+    <select id="getAllRole" resultMap="optionsMap">
+        SELECT id,roleDesc FROM role
+    </select>
+    <resultMap id="optionsMap" type="com.gec.domain.Option">
+        <result property="val" column="id"/>
+        <result property="text" column="roleDesc"/>
+    </resultMap>
+
+    <!--
+         //{3}修改角色id
+         void updateOneRoleInfo(User user);
+    -->
+    <select id="updateOneRoleInfo">
+        UPDATE user_role
+        <set>
+            <if test="role_id!=null">
+                role_id = #{role_id}
+            </if>
+        </set>
+        WHERE user_id = #{id}
+    </select>
+</mapper>

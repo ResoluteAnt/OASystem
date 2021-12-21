@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gec.dao.ProcessConfigMapper">
+	<!--
+		{1}获得最新版本
+		ProcessConfig getProcConfigByCategory(
+			@Param("category") String category);
+	 -->
+	<select id="getProcConfigByCategory"
+		resultType="com.gec.domain.ProcessConfig">
+		select * from t_proc_config c
+		where c.procCategory=#{category}
+		order by c.version desc
+		limit 0,1
+	</select>
+
+	<!-- 添加一个流程布署 -->
+	<insert id="addProcessConfig">
+	  insert into t_proc_config(
+	  	  id,deplomentId,procDefId,procCategory,
+	  	  version,procKey,note,createDate
+	  )values (
+	  	  #{id},#{deplomentId},#{procDefId},#{procCategory},
+	  	  #{version},#{procKey},#{note},now()
+	  	  )
+  </insert>
+	<!--
+		{3}搜索列表			[ok]
+		List<ProcessConfig> searchConfigList(
+			Map<String,String> map);
+	-->
+	<select id="searchConfigList" resultType= "com.gec.domain.ProcessConfig">
+		SELECT * FROM t_proc_config
+		<where>
+			<if test="procCategory!=null">
+				and procCategory like "%"#{procCategory}"%"
+			</if>
+			<if test="note!=null">
+				and note like "%"#{note}"%"
+			</if>
+		</where>
+	</select>
+	<!--
+		//{3}根据id查询一个数据字典对象
+			ProcessConfig getProcConfigById(String id);
+	-->
+	<select id="getProcConfigById" resultType= "com.gec.domain.ProcessConfig">
+		SELECT * FROM t_proc_config
+	  	where id = #{id}
+	</select>
+	<!--
+		//{4}根据id删除一条记录
+		void delplo(String id);
+	-->
+	<delete id="delplo">
+		delete from t_proc_config
+		where id = #{id}
+	</delete>
+</mapper>

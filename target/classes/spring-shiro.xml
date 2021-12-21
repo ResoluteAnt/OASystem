@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- {1}EhCacheManager 缓存管理器
+         org.apache.shiro.cache.ehcache.EhCacheManager
+        {+}缓存管理器配置文件(属性)
+            (关联与加载配置文件之用)
+    -->
+    <bean id="EhCacheManager"
+          class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManagerConfigFile"
+                  value="classpath:ehcache.xml"/>
+    </bean>
+
+    <!-- {2}默认Web安全管理器
+        org.apache.shiro.web.mgt.DefaultWebSecurityManager
+        [a]********{属性1}
+            (引用上面的缓存管理器)
+        [b]realm {属性2}
+            (如果有用到自定义的Realm，设置此项)
+    -->
+    <bean id="securityManager"
+          class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="cacheManager" ref="EhCacheManager"/>
+        <!--{2}配置 Realm-->
+        <property name="realm" ref="MyAuthorizationRealm"/>
+    </bean>
+    <!-- [3]ShiroFilterFactoryBean
+        org.apache.shiro.spring.web.ShiroFilterFactoryBean
+        id: 必须与web.xml 中过滤器名称相同
+               (即: shiroFilter)
+    -->
+    <bean id="shiroFilter"
+          class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!--[1]引用上面的安全管理器 securityManager -->
+        <property name="securityManager" ref="securityManager"/>
+
+        <!--[2]loginUrl  用户没有登录，自动跳转到这个地址-->
+        <property name="loginUrl" value="/User/showLogin?errcode=4"/>
+        <!--[3]successUrl 登录之后会自动到这里-->
+        <property name="successUrl" value="/User/index"/>
+        <!--[4]unauthorizeUrl
+            当用户访问需要权限的资源式，
+            没有这个权限，它会自动跳转到这个地址
+        -->
+        <property name="unauthorizedUrl"
+                  value="/unauthorizedUrl.jsp"/>
+        <!--[5]过滤器链的定义filterChainDefinitionMap
+            调用 set 方法，做依赖注入
+            setFilterChainDefinitionMap
+        -->
+        <property name="filterChainDefinitionMap"
+                  ref="filterChainDefinitionMap"/>
+        <!--[6]注册自定义的过滤器：filters-->
+        <property name="filters">
+            <map>
+                <!--退出过滤器-->
+                <entry key="logout" value-ref="systemLogoutFilter" />
+            </map>
+        </property>
+    </bean>
+    <!-- {7}MyAuthorizationRealm[自定义] -->
+    <bean id="MyAuthorizationRealm"
+          class="com.gec.realms.MyAuthorizationRealm"
+          init-method="initRealm"/>
+    <!-- {8}过滤器{自定义} -->
+    <!-- {9}设置一个工程Bean(产生过滤器链的数据)-->
+    <bean id="filterDataFactory"
+          class="com.gec.shiro.FilterDataSource">
+        <property name="AnonymousFilter">
+            <!-- {1}配置不需要登录的访问资源 -->
+            <value>
+                /Leave/showLeaveForm = anon
+                /Leave/submitLeave = anon
+                /Leave/myInitiate = anon
+                /Leave/jsonMyInitiate = anon
+                /Leave/waitMyApprove = anon
+                /Leave/jsonWaitMyApprove = anon
+                /Leave/taskDetail = anon
+                /Leave/doApprove = anon
+                /Reimburse/showReimburseForm = anon
+                /Reimburse/submitReimburse = anon
+                /Reimburse/myInitiate = anon
+                /Reimburse/jsonMyInitiate = anon
+                /Reimburse/waitMyApprove = anon
+                /Reimburse/jsonWaitMyApprove = anon
+                /Reimburse/taskDetail = anon
+                /Reimburse/doApprove = anon
+                /User/showLogin = anon
+                /User/login = anon
+                /static/*/* = anon
+            </value>
+        </property>
+    </bean>
+    <!-- {10}配置一个过滤器链的Map
+         使用实例工厂来装配  Map 数据。
+    -->
+    <bean id="filterChainDefinitionMap"
+          class="java.util.Map"
+          factory-bean="filterDataFactory"
+          factory-method="getFilterDefinitions"/>
+
+    <!-- {9}测试Bean -->
+    <bean id="testBean" class="com.gec.domain.TestBean"/>
+
+
+</beans>

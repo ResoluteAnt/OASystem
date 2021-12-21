@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gec.dao.DocumentMapper">
+  <resultMap id="BaseResultMap" type="com.gec.domain.Document">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="documentName" jdbcType="VARCHAR" property="documentname" />
+    <result column="uploader" jdbcType="VARCHAR" property="uploader" />
+    <result column="fileName" jdbcType="VARCHAR" property="filename" />
+    <result column="fileSize" jdbcType="VARCHAR" property="filesize" />
+    <result column="downTimes" jdbcType="INTEGER" property="downtimes" />
+    <result column="createDate" jdbcType="TIMESTAMP" property="createdate" />
+    <result column="note" jdbcType="VARCHAR" property="note" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, documentName, uploader, fileName, fileSize, downTimes, createDate, note
+  </sql>
+  <select id="selectByExample" parameterType="com.gec.domain.DocumentExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from document
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from document
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from document
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.gec.domain.DocumentExample">
+    delete from document
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.gec.domain.Document">
+    insert into document (id, documentName, uploader, 
+      fileName, fileSize, downTimes, 
+      createDate, note)
+    values (#{id,jdbcType=VARCHAR}, #{documentname,jdbcType=VARCHAR}, #{uploader,jdbcType=VARCHAR}, 
+      #{filename,jdbcType=VARCHAR}, #{filesize,jdbcType=VARCHAR}, #{downtimes,jdbcType=INTEGER}, 
+      #{createdate,jdbcType=TIMESTAMP}, #{note,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.gec.domain.Document">
+    insert into document
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="documentname != null">
+        documentName,
+      </if>
+      <if test="uploader != null">
+        uploader,
+      </if>
+      <if test="filename != null">
+        fileName,
+      </if>
+      <if test="filesize != null">
+        fileSize,
+      </if>
+      <if test="downtimes != null">
+        downTimes,
+      </if>
+      <if test="createdate != null">
+        createDate,
+      </if>
+      <if test="note != null">
+        note,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="documentname != null">
+        #{documentname,jdbcType=VARCHAR},
+      </if>
+      <if test="uploader != null">
+        #{uploader,jdbcType=VARCHAR},
+      </if>
+      <if test="filename != null">
+        #{filename,jdbcType=VARCHAR},
+      </if>
+      <if test="filesize != null">
+        #{filesize,jdbcType=VARCHAR},
+      </if>
+      <if test="downtimes != null">
+        #{downtimes,jdbcType=INTEGER},
+      </if>
+      <if test="createdate != null">
+        #{createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.gec.domain.DocumentExample" resultType="java.lang.Long">
+    select count(*) from document
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update document
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.documentname != null">
+        documentName = #{record.documentname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.uploader != null">
+        uploader = #{record.uploader,jdbcType=VARCHAR},
+      </if>
+      <if test="record.filename != null">
+        fileName = #{record.filename,jdbcType=VARCHAR},
+      </if>
+      <if test="record.filesize != null">
+        fileSize = #{record.filesize,jdbcType=VARCHAR},
+      </if>
+      <if test="record.downtimes != null">
+        downTimes = #{record.downtimes,jdbcType=INTEGER},
+      </if>
+      <if test="record.createdate != null">
+        createDate = #{record.createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.note != null">
+        note = #{record.note,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update document
+    set id = #{record.id,jdbcType=VARCHAR},
+      documentName = #{record.documentname,jdbcType=VARCHAR},
+      uploader = #{record.uploader,jdbcType=VARCHAR},
+      fileName = #{record.filename,jdbcType=VARCHAR},
+      fileSize = #{record.filesize,jdbcType=VARCHAR},
+      downTimes = #{record.downtimes,jdbcType=INTEGER},
+      createDate = #{record.createdate,jdbcType=TIMESTAMP},
+      note = #{record.note,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gec.domain.Document">
+    update document
+    <set>
+      <if test="documentname != null">
+        documentName = #{documentname,jdbcType=VARCHAR},
+      </if>
+      <if test="uploader != null">
+        uploader = #{uploader,jdbcType=VARCHAR},
+      </if>
+      <if test="filename != null">
+        fileName = #{filename,jdbcType=VARCHAR},
+      </if>
+      <if test="filesize != null">
+        fileSize = #{filesize,jdbcType=VARCHAR},
+      </if>
+      <if test="downtimes != null">
+        downTimes = #{downtimes,jdbcType=INTEGER},
+      </if>
+      <if test="createdate != null">
+        createDate = #{createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="note != null">
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.gec.domain.Document">
+    update document
+    set documentName = #{documentname,jdbcType=VARCHAR},
+      uploader = #{uploader,jdbcType=VARCHAR},
+      fileName = #{filename,jdbcType=VARCHAR},
+      fileSize = #{filesize,jdbcType=VARCHAR},
+      downTimes = #{downtimes,jdbcType=INTEGER},
+      createDate = #{createdate,jdbcType=TIMESTAMP},
+      note = #{note,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

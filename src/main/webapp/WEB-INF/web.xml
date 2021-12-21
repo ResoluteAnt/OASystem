@@ -1,0 +1,97 @@
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+  <display-name>OASystem</display-name>
+  <!--{1}配置全局初始化参数-->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:applicationContext.xml</param-value>
+  </context-param>
+  <!--{2}配置Spring 的Web监听器-->
+  <listener>
+    <listener-class>
+      org.springframework.web.context.ContextLoaderListener
+    </listener-class>
+  </listener>
+  <!--{3}配置编码过滤器-->
+  <filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!--{4}默认servlet，放行静态资源放行-->
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/static/*</url-pattern>
+    <url-pattern>/index.jsp</url-pattern>
+    <url-pattern>/404.html</url-pattern>
+    <url-pattern>/unauthorizedUrl.jsp</url-pattern>
+  </servlet-mapping>
+
+  <!--{5}SpringMVC 前端处理器
+          {a} DispatcherServlet
+          所在包：spring-mvc.jar
+          子包：**[W][S]关键字
+          全名：org.springframework.web.servlet.DispatcherServlet
+          {b} 初始化参数：contextConfigLocation
+          {c} 映射地址：/
+   -->
+  <servlet>
+    <servlet-name>DispatcherServlet</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:spring-mvc.xml</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DispatcherServlet</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+  <!--{6}Spring 代理过滤器
+          到时在 spring-shiro.xml 中过滤器的名字要与这个相同
+          shiroFilter
+    -->
+  <filter>
+     <filter-name>shiroFilter</filter-name>
+     <filter-class>
+       org.springframework.web.filter.DelegatingFilterProxy
+     </filter-class>
+     <!-- {2} 由 Spring 容器来管理其生命周期的 (不是由 tomcat 容器来管理)。
+     如果设置  "targetFilterLifecycle" 为 true，则  Spring  来管理
+     Filter.init() 和  Filter.destroy() 若为 false，则这两个方法失效。
+      -->
+    <init-param>
+      <param-name>targetFilterLifeCircle</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>shiroFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!--定义错误页-->
+  <error-page>
+    <error-code>404</error-code>
+    <location>/404.html</location>
+  </error-page>
+</web-app>

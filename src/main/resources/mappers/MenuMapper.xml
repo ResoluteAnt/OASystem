@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gec.dao.MenuMapper">
+    <!--
+        Set<Permission> getSysPermission();
+    -->
+    <select id="getSysPermission"
+            resultType="com.gec.domain.Permission">
+        select id,mapping,permission
+        from menu
+    </select>
+
+    <!--
+         //{2}根据主菜单的权限获得主菜单下的所有子菜单的名称   [ok]
+        List<Menu> getMenuDataAll(
+            @Param("supMenuId") String supMenuId );
+    -->
+    <select id="getMenuDataAll"
+            resultType="com.gec.domain.Menu">
+        SELECT  m.id,m.parentId,m.note,m.mapping,m.permission
+        FROM menu m
+        WHERE m.parentId = #{supMenuId}
+        AND m.note LIKE '%(view)'
+    </select>
+    <!--
+          //{3}根据权限获得相应的菜单 [ok]
+        Menu getMenuDataOne(
+            @Param("permission") String permission);
+    -->
+    <select id="getMenuDataOne"
+            resultType="com.gec.domain.Menu">
+        SELECT m.id,m.parentId,m.note,m.mapping,m.permission
+        FROM menu m
+        WHERE permission = #{permission}
+        AND m.note LIKE '%(view)%'
+    </select>
+
+    <!--
+          //{4}根据角色Id去获得权限
+        List<String> getMenuDateByRoleId(
+            @Param("RoleId") String RoleId);
+    -->
+    <select id="getMenuDateByRoleId"
+            resultType="string">
+       SELECT rp.permission
+       FROM role_permission rp WHERE role_id = #{RoleId}
+    </select>
+</mapper>
