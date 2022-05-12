@@ -3,7 +3,6 @@ package com.gec.service;
 import com.gec.domain.Dept;
 import com.gec.exception.EntityException;
 import com.github.pagehelper.Page;
-import sun.plugin.javascript.navig.Link;
 
 import java.util.List;
 import java.util.Map;
